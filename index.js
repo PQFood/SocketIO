@@ -27,7 +27,7 @@ const removeUser = (socketId) => {
 
 io.on("connection", (socket) => {
     console.log("co nguoi ket noi")
-    socket.on("newUser", async ({ user, position }) => {
+    socket.on("newUser", async ({ position }) => {
         if (position === 1)
             socket.join("waiter");
         else if (position === 2)
@@ -36,10 +36,24 @@ io.on("connection", (socket) => {
             socket.join("shipper");
     })
 
-    socket.on("sendNotification", ({ senderName }) => {
-        io.to("chef").emit("getNotification", "thong bao ne")
-
+    socket.on("sendNotificationAddOrder", ({ senderName,table }) => {
+        io.to("chef").emit("getNotificationAddOrder",senderName + " đã lập hóa đơn cho "+ table )
     })
+    
+    socket.on("sendNotificationUpdate", ({ senderName,table, act }) => {
+        console.log(senderName)
+        console.log(table)
+        console.log(act)
+        if(act === 1){
+            console.log("1")
+            io.to("chef").to("waiter").emit("getNotificationUpdate",senderName + " đã xác nhận hóa đơn "+ table)
+        }
+        else if(act === 2){
+            console.log("2")
+            io.to("chef").to("waiter").emit("getNotificationUpdate",senderName + " đã huỷ hóa đơn "+ table)
+        }
+    })
+
 
     socket.on("disconnect", () => {
         console.log("co nguoi ngat ket noi")

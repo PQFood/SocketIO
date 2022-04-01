@@ -36,22 +36,31 @@ io.on("connection", (socket) => {
             socket.join("shipper");
     })
 
-    socket.on("sendNotificationAddOrder", ({ senderName,table }) => {
-        io.to("chef").emit("getNotificationAddOrder",senderName + " đã lập hóa đơn cho "+ table )
+    socket.on("sendNotificationAddOrder", ({ senderName, table }) => {
+        io.to("chef").emit("getNotificationAddOrder", senderName + " đã lập hóa đơn cho " + table)
     })
-    
-    socket.on("sendNotificationUpdate", ({ senderName,table, act }) => {
-        console.log(senderName)
-        console.log(table)
-        console.log(act)
-        if(act === 1){
-            console.log("1")
-            io.to("chef").to("waiter").emit("getNotificationUpdate",senderName + " đã xác nhận hóa đơn "+ table)
+
+    socket.on("sendNotificationUpdate", ({ senderName, table, act }) => {
+        if (act === 1) {
+            io.to("chef").to("waiter").emit("getNotificationUpdate", { message: senderName + " đã xác nhận hóa đơn " + table, type: "success" })
         }
-        else if(act === 2){
-            console.log("2")
-            io.to("chef").to("waiter").emit("getNotificationUpdate",senderName + " đã huỷ hóa đơn "+ table)
+        else if (act === 2) {
+            io.to("chef").to("waiter").emit("getNotificationUpdate", { message: senderName + " đã huỷ hóa đơn " + table, type: "danger" })
         }
+    })
+
+    socket.on("sendNotificationWaiterUpdate", ({ senderName, table, act }) => {
+        if (act === 1) {
+            io.to("chef").to("waiter").emit("getNotificationWaiterUpdate", { message: senderName + " đã cập nhật hóa đơn " + table, type: "normal" })
+        }
+        else if (act === 2) {
+            io.to("chef").to("waiter").emit("getNotificationWaiterUpdate", { message: senderName + " đã huỷ hóa đơn " + table, type: "danger" })
+        }
+    })
+
+    socket.on("sendNotificationChefNote", ({ senderName, table }) => {
+        io.to("waiter").emit("getNotificationChefNote", "Thông báo mới từ " + senderName + " về " + table )
+
     })
 
 

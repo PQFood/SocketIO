@@ -1,9 +1,9 @@
 import { Server } from "socket.io";
 
 const io = new Server({
-    // cors: {
-    //     origin: "http://localhost:19000"
-    // }
+    cors: {
+        origin: "http://localhost:8080"
+    }
 });
 
 // let onlineUsers = [];
@@ -60,13 +60,29 @@ io.on("connection", (socket) => {
 
     socket.on("sendNotificationChefNote", ({ senderName, table }) => {
         io.to("waiter").emit("getNotificationChefNote", "Thông báo mới từ " + senderName + " về " + table )
+    })
 
+    socket.on("sendNotificationChefCompleteOrder", ({ senderName, table }) => {
+        io.to("waiter").to("chef").emit("getNotificationChefCompleteOrder", senderName + " đã hoàn thành món " +table )
+    })
+
+    socket.on("sendNotificationWaiterCompleteOrder", ({ senderName, table }) => {
+        io.to("waiter").to("chef").emit("getNotificationWaiterCompleteOrder", senderName + " đã hoàn thành món " +table )
+    })
+
+    socket.on("sendNotificationWaiterCompletePayOrder", ({ senderName, table }) => {
+        io.to("waiter").to("chef").emit("getNotificationWaiterCompletePayOrder", senderName + " đã hoàn thành hóa đơn " +table )
+    })
+
+    socket.on("sendNotificationBookShip", () => {
+        io.to("waiter").emit("getNotificationBookShip", "Khách hàng đặt lịch mới" )
     })
 
 
-    socket.on("disconnect", () => {
+    socket.on('forceDisconnect', function(){
         console.log("co nguoi ngat ket noi")
-    })
+        socket.disconnect();
+    });
 
 });
 
